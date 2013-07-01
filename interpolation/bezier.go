@@ -3,13 +3,7 @@
 
 /*	Package provides interpolation and curves smoothing mathematical functions and tools.
 */
-package	interpolation
-
-import	(
-	"math"
-	"math_tools"
-)
-
+package	interpolation	;	import	( "math" ; "math_tools" )
 
 /*	Calculates the point ( by offset percent ) from a Bézier curve
 
@@ -31,17 +25,14 @@ func Bezier_point ( control_points  * [][] float64, offset  float64 )		( result 
 
 	if	points_len == 0		{	return	result	}
 
-
 //	Care : Inclusive N
 	points_len --
-
 
 	var (
 		berstein_basis	float64
 		degree			= len ( ( * control_points ) [ 0 ] )
 		offset_complementary	= 1.0 - offset
 	)
-
 
 //	Fill resulting point from P0 :	P0 * ( 1 - t )
 
@@ -68,14 +59,10 @@ func Bezier_point ( control_points  * [][] float64, offset  float64 )		( result 
 
 	}*/
 
-
 	switch	points_len	{
 
 //		P0 only	: result = P0
-		case 0 :
-			result	= ( * control_points ) [ 0 ]
-			return	result
-
+		case 0 :	return	( * control_points ) [ 0 ]
 
 //		Linear	: result = ( 1 - t ) * P0  +  t * P1
 		case 1 :
@@ -84,14 +71,10 @@ func Bezier_point ( control_points  * [][] float64, offset  float64 )		( result 
 
 			for	di := 0 ; di < degree ; di ++	{
 
-				P0	= ( * control_points ) [ 0 ][ di ]
-				P1	= ( * control_points ) [ 1 ][ di ]
-
+				P0, P1	= ( * control_points ) [ 0 ][ di ] ,	( * control_points ) [ 1 ][ di ]
 				result [ di ]	= P0 * offset_complementary + P1 * offset
 			}
-
-			return	result
-
+			return
 
 //		Quadratic	: result = P0 * ( 1 − t )^2  +  2 * P1 * ( 1 − t ) * t + P2 * t^2
 		case 2 :
@@ -113,9 +96,7 @@ func Bezier_point ( control_points  * [][] float64, offset  float64 )		( result 
 				result [ di ]	= P0 * offset_complementary_Pow2 +
 					2 * P1 * offset_Mul_complementary + P2 * offset_Pow2
 			}
-
-			return	result
-
+			return
 
 //		Cubic	: result = P0 * ( 1 − t )^3  +  3 * P1 * t * ( 1 − t )^2  +  3 * P2 * ( 1 − t ) * t^2  +  P3 * t^3
 		case 3 :
@@ -139,7 +120,7 @@ func Bezier_point ( control_points  * [][] float64, offset  float64 )		( result 
 				result [ di ]	= P0 * offset_complementary_Pow3  +  P3 * offset_Pow3  +  3 *
 					( P1 * offset_Mul_complementary_Pow2  +  P2 * offset_Pow2_Mul_complementary )
 			}
-			return	result
+			return
 	}
 
 
@@ -159,10 +140,8 @@ func Bezier_point ( control_points  * [][] float64, offset  float64 )		( result 
 
 			result [ di ]	+= ( * control_points ) [ point_i ][ di ]  *  berstein_basis
 		}
-
 	}
-
-	return	result
+	return
 }
 
 
@@ -219,7 +198,6 @@ func Bernstein_basis ( control_points_num, control_point_index uint, offset floa
 			if	control_points_num == 4	{
 				return 6.0 * ( 1.0 - offset ) * ( 1.0 - offset ) * offset * offset
 			}
-			break
 	}
 
 

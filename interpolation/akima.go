@@ -1,13 +1,6 @@
 //	Copyright (c) 2013, Bogdan S.
 //	Use of this source code is governed by a BSD-style license that can be found in the LICENSE file.
-
-package	interpolation
-
-import	(
-	"math"
-	"math_tools"
-)
-
+package	interpolation	;	import	( "math" ; "math_tools" )
 
 /*	HIROSHI AKIMA "A method of smooth curve fitting" 1969
 
@@ -34,7 +27,6 @@ import	(
 
 
 	1.1) Special case if m1 == m2 && m3 == m4	:
-
 		t = ( m2 + m3 ) / 2
 
 
@@ -46,7 +38,6 @@ import	(
 		y = p0 +  p1( x - x1 )  +  p2( x - x1 )^2  +  p3( x - x1 )^3
 
 	where
-
 		p0 = y1
 		p1 = t1
 		p2 = [ 3( y2 - y1 ) / ( x2 - x1 )  - 2* t1  -  t2 ]  /  ( x2 - x1 )
@@ -104,23 +95,16 @@ import	(
 			y5  =  y4 + ( x5 - x4 ) * ( ( y3 - y2 ) / ( x3 - x2 )  +  ( y4 - y3 ) / ( x4 - x3 )  -  ( y2 - y1 ) / ( x2 - x1 ) )
 
 
-	Or using Lagrange polynomial
+	Or using Lagrange polynomial ( http://mathworld.wolfram.com/LagrangeInterpolatingPolynomial.html )
 
 		y2	= y3 * ( x2 - x4 ) * ( x2 - x5 )  /  ( ( x3 - x4 ) * ( x3 - x5 ) )	+
 			  y4 * ( x2 - x3 ) * ( x2 - x5 )  /  ( ( x4 - x3 ) * ( x4 - x5 ) )	+
 			  y5 * ( x2 - x3 ) * ( x2 - x4 )  /  ( ( x5 - x3 ) * ( x5 - x4 ) )
 
-		y1	=
-			y2 * ( x1 - x3 ) * ( x1 - x4 )	/
-			   ( ( x2 - x3 ) * ( x2 - x4 ) )	+
-
-			y3 * ( x1 - x2 ) * ( x1 - x4 )	/
-			   ( ( x3 - x2 ) * ( x3 - x4 ) )	+
-
-			y4 * ( x1 - x2 ) * ( x1 - x3 )	/
-			   ( ( x4 - x2 ) * ( x4 - x3 ) )
+		y1	= y2 * ( x1 - x3 ) * ( x1 - x4 )  /  ( ( x2 - x3 ) * ( x2 - x4 ) )	+
+			  y3 * ( x1 - x2 ) * ( x1 - x4 )  /  ( ( x3 - x2 ) * ( x3 - x4 ) )	+
+			  y4 * ( x1 - x2 ) * ( x1 - x3 )  /  ( ( x4 - x2 ) * ( x4 - x3 ) )
 */
-//	----------------------------------------
 
 /*	Akima interpolation and smooth curve fitting
 
@@ -138,21 +122,17 @@ func Akima_interval_curve  ( data_points  * [][] float64, x  float64 )	( interva
 		x < ( * data_points ) [ 0 ][ 0 ]	||
 		x > ( * data_points ) [ points_len -1 ][ 0 ]	{
 
-		err	= math_tools.Arg_range_error ()
-		return	interval_curve, err
+		return	interval_curve, math_tools.Arg_range_error ()
 	}
-
 	var (
 //		Interval points where x lies : x1 <= x <= x2
 		y1, y2	float64
 		x1, x2	float64
 
 		i	uint
-
 //		Slopes ( 5 point ) of interval points
 		t1, t2	float64
 	)
-
 //	[ Double side search ] Find the control points where x belong
 
 	for	i_x1, i_x2 := uint ( points_len -2 ), uint ( 1 )
@@ -168,30 +148,22 @@ func Akima_interval_curve  ( data_points  * [][] float64, x  float64 )	( interva
 
 		if	x >= x1	{
 
-			i	= i_x1 +1
-			break
+			i	= i_x1 +1	;	break
 		}
 	}
-
-	x2	= ( * data_points ) [ i ][ 0 ]
-	y2	= ( * data_points ) [ i ][ 1 ]
+	x2, y2	= ( * data_points ) [ i ][ 0 ] ,	( * data_points ) [ i ][ 1 ]
 	t2	= slope_five_point ( data_points, points_len, i )
-
 	i --
-	x1	= ( * data_points ) [ i ][ 0 ]
-	y1	= ( * data_points ) [ i ][ 1 ]
+	x1, y1	= ( * data_points ) [ i ][ 0 ] ,	( * data_points ) [ i ][ 1 ]
 	t1	= slope_five_point ( data_points, points_len, i )
 
-//	----------------------------------------
 //	See section 2 :		y = p0 +  p1( x - x1 )  +  p2( x - x1 )^2  +  p3( x - x1 )^3
 
 	interval_curve	= & Akima_curve {
 		X1	: x1,	X2	: x2,
 		T1	: t1,	T2	: t2,	Index_x1	: i,
 	}
-	interval_curve.set_coefficients ( y1, y2 )
-
-	return	interval_curve, err
+	interval_curve.set_coefficients ( y1, y2 ) ;	return
 }
 
 //	----------------------------------------
@@ -203,11 +175,9 @@ type Akima_curve struct {
 
 	Index_x1	uint
 	X1, X2, T1, T2	float64
-
 //	Coefficients for a polynomial y
 	p0, p2, p3	float64
 }
-
 
 /*	Calculates a point on a given interval	x1 <=  x  <= x2  ( bounds are not checked )
 
@@ -259,16 +229,11 @@ func ( self  * Akima_curve )	Next_curve  ( data_points  * [][] float64 )		( next
 	next	= new ( Akima_curve )
 	next.Index_x1	= self.Index_x1 +1
 
-	next.X1	= self.X2
-	next.T1	= self.T2
+	next.X1, next.T1	= self.X2 ,	self.T2
 	next.X2	= ( * data_points ) [ new_i_x2 ][ 0 ]
 	next.T2	= slope_five_point ( data_points, points_len, new_i_x2 )
 
-	var y1	= ( * data_points ) [ next.Index_x1 ][ 1 ]
-	var y2	= ( * data_points ) [ new_i_x2 ][ 1 ]
-	next.set_coefficients ( y1, y2 )
-
-	return	next
+	next.set_coefficients ( ( * data_points ) [ next.Index_x1 ][ 1 ] , ( * data_points ) [ new_i_x2 ][ 1 ] ) ;	return
 }
 
 /*	Computes a curve for the prev interval ( Index_x1 -1 )
@@ -288,18 +253,13 @@ func ( self  * Akima_curve )	Prev_curve  ( data_points  * [][] float64 )		( prev
 
 	prev.X1	= ( * data_points ) [ prev.Index_x1 ][ 0 ]
 	prev.T1	= slope_five_point ( data_points, points_len, prev.Index_x1 )
-	prev.X2	= self.X1
-	prev.T2	= self.T1
+	prev.X2, prev.T2	= self.X1 ,	self.T1
 
-	var y1	= ( * data_points ) [ prev.Index_x1 ][ 1 ]
-	var y2	= ( * data_points ) [ self.Index_x1 ][ 1 ]
-	prev.set_coefficients ( y1, y2 )
-
-	return	prev
+	prev.set_coefficients ( ( * data_points ) [ prev.Index_x1 ][ 1 ] , ( * data_points ) [ self.Index_x1 ][ 1 ] ) ;	return
 }
 
 func ( self  * Akima_curve )	set_coefficients ( y1, y2  float64 )	{
-	var (
+	var	(
 		x2_minus_x1	= self.X2 - self.X1
 		y2_minus_y1	= y2 - y1
 
@@ -314,40 +274,27 @@ func ( self  * Akima_curve )	set_coefficients ( y1, y2  float64 )	{
 
 
 func slope_five_point  ( data_points  * [][] float64, points_len, i  uint )		float64	{
-	var (
-		x1, x2, x3, x4, x5	float64
-		y1, y2, y3, y4, y5	float64
 
-//		2 point Slopes
-		m12, m23, m34, m45	float64
-	)
+//	   	2 point Slopes
+	var	m12, m23, m34, m45	,	x1, x2, x3, x4, x5	,	y1, y2, y3, y4, y5	float64
 
-	x3	= ( * data_points ) [ i ][ 0 ]
-	y3	= ( * data_points ) [ i ][ 1 ]
+	x3, y3	= ( * data_points ) [ i ][ 0 ] ,	( * data_points ) [ i ][ 1 ]
 
 	if	i == 0 || i == 1	{
 
-		x4	= ( * data_points ) [ i +1 ][ 0 ]
-		y4	= ( * data_points ) [ i +1 ][ 1 ]
+		x4, y4	= ( * data_points ) [ i +1 ][ 0 ] ,	( * data_points ) [ i +1 ][ 1 ]
+		x5, y5	= ( * data_points ) [ i +2 ][ 0 ] ,	( * data_points ) [ i +2 ][ 1 ]
 
-		x5	= ( * data_points ) [ i +2 ][ 0 ]
-		y5	= ( * data_points ) [ i +2 ][ 1 ]
-
-		m34	= ( y4 - y3 ) / ( x4 - x3 )
-		m45	= ( y5 - y4 ) / ( x5 - x4 )
+		m34, m45	= ( y4 - y3 ) / ( x4 - x3 ) ,	( y5 - y4 ) / ( x5 - x4 )
 
 	} else
 
 	if	i +1 == points_len || i +2 == points_len	{
 
-		x1	= ( * data_points ) [ i -2 ][ 0 ]
-		y1	= ( * data_points ) [ i -2 ][ 1 ]
+		x1, y1	= ( * data_points ) [ i -2 ][ 0 ] ,	( * data_points ) [ i -2 ][ 1 ]
+		x2, y2	= ( * data_points ) [ i -1 ][ 0 ] ,	( * data_points ) [ i -1 ][ 1 ]
 
-		x2	= ( * data_points ) [ i -1 ][ 0 ]
-		y2	= ( * data_points ) [ i -1 ][ 1 ]
-
-		m12	= ( y2 - y1 ) / ( x2 - x1 )
-        m23	= ( y3 - y2 ) / ( x3 - x2 )
+		m12, m23	= ( y2 - y1 ) / ( x2 - x1 ) ,	( y3 - y2 ) / ( x3 - x2 )
 	}
 
 	switch	i	{
@@ -356,75 +303,53 @@ func slope_five_point  ( data_points  * [][] float64, points_len, i  uint )		flo
 
 			x2	= x3 + x4 - x5
 			y2	= y3 - ( x3 - x2 ) * ( 2 * m34  - m45 )
-
 			m23	= ( y3 - y2 ) / ( x3 - x2 )
 
 			x1	= 2 * x3 - x5
 			y1	= y2 - ( x2 - x1 ) * ( 2 * m23  - m34 )
-
 			m12	= ( y2 - y1 ) / ( x2 - x1 )
-			break
 
 		case	1 :
 
-			x2	= ( * data_points ) [ i -1 ][ 0 ]
-			y2	= ( * data_points ) [ i -1 ][ 1 ]
-
+			x2, y2	= ( * data_points ) [ i -1 ][ 0 ] ,	( * data_points ) [ i -1 ][ 1 ]
 			m23	= ( y3 - y2 ) / ( x3 - x2 )
 
 			x1	= 2 * x3 - x5
 			y1	= y2 - ( x2 - x1 ) * ( 2 * m23  - m34 )
-
 			m12	= ( y2 - y1 ) / ( x2 - x1 )
-			break
 
 		case	points_len -2 :
 
-			x4	= ( * data_points ) [ i +1 ][ 0 ]
-			y4	= ( * data_points ) [ i +1 ][ 1 ]
-
+			x4, y4	= ( * data_points ) [ i +1 ][ 0 ] ,	( * data_points ) [ i +1 ][ 1 ]
 			m34	= ( y4 - y3 ) / ( x4 - x3 )
 
 			x5	= 2 * x3 - x1
 			y5	= y4 + ( x5 - x4 ) * ( 2 * m34  - m23 )
-
 			m45	= ( y5 - y4 ) / ( x5 - x4 )
-			break
 
 		case	points_len -1 :
 
 			x4	= x3 + x2 - x1
 			y4	= y3 + ( x4 - x3 ) * ( 2 * m23 - m12 )
-
 			m34	= ( y4 - y3 ) / ( x4 - x3 )
 
 			x5	= 2 * x3 - x1
 			y5	= y4 + ( x5 - x4 ) * ( 2 * m34  - m23 )
-
 			m45	= ( y5 - y4 ) / ( x5 - x4 )
-			break
 
 		default	:
 
-			x1, x2	= ( * data_points ) [ i -2 ][ 0 ], ( * data_points ) [ i -1 ][ 0 ]
-			y1, y2	= ( * data_points ) [ i -2 ][ 1 ], ( * data_points ) [ i -1 ][ 1 ]
+			x1, x2	= ( * data_points ) [ i -2 ][ 0 ] ,	( * data_points ) [ i -1 ][ 0 ]
+			y1, y2	= ( * data_points ) [ i -2 ][ 1 ] ,	( * data_points ) [ i -1 ][ 1 ]
+			x5, x4	= ( * data_points ) [ i +2 ][ 0 ] ,	( * data_points ) [ i +1 ][ 0 ]
+			y5, y4	= ( * data_points ) [ i +2 ][ 1 ] ,	( * data_points ) [ i +1 ][ 1 ]
 
-			x5, x4	= ( * data_points ) [ i +2 ][ 0 ], ( * data_points ) [ i +1 ][ 0 ]
-			y5, y4	= ( * data_points ) [ i +2 ][ 1 ], ( * data_points ) [ i +1 ][ 1 ]
-
-			m12	= ( y2 - y1 ) / ( x2 - x1 )
-			m23	= ( y3 - y2 ) / ( x3 - x2 )
-			m34	= ( y4 - y3 ) / ( x4 - x3 )
-			m45	= ( y5 - y4 ) / ( x5 - x4 )
-			break
+			m12, m23, m34, m45	= ( y2 - y1 ) / ( x2 - x1 ) , ( y3 - y2 ) / ( x3 - x2 ) , ( y4 - y3 ) / ( x4 - x3 ) , ( y5 - y4 ) / ( x5 - x4 )
 	}
 
-	if	m12 == m23	&& m34 == m45	{
-
-		return	( m23 + m34 ) / 2.0
+	if	m12 == m23	&& m34 == m45	{	return	( m23 + m34 ) / 2.0
 	} else {
-
-		var (
+		var	(
 			m45_minus_m34	= math.Abs ( m45 - m34 )
 			m23_minus_m12	= math.Abs ( m23 - m12 )
 		)
