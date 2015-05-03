@@ -3,7 +3,7 @@
 
 /*	Package provides interpolation and curves smoothing mathematical functions and tools.
 */
-package	interpolation	;	import	( "math" ; "math_tools" )
+package	interpolation	;	import	( "math" ; "github.com/sjbog/math_tools" )
 
 /*	Calculates the point ( by offset percent ) from a Bézier curve
 

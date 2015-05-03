@@ -1,12 +1,11 @@
 //	Copyright (c) 2013, Bogdan S.
 //	Use of this source code is governed by a BSD-style license that can be found in the LICENSE file.
 
-package	interpolation_test
+package	interpolation
 
 import	(
 	"fmt"
 	"testing"
-	. "math_tools/interpolation"
 )
 
 

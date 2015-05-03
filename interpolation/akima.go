@@ -1,6 +1,6 @@
 //	Copyright (c) 2013, Bogdan S.
 //	Use of this source code is governed by a BSD-style license that can be found in the LICENSE file.
-package	interpolation	;	import	( "math" ; "math_tools" )
+package	interpolation	;	import	( "math" ; "github.com/sjbog/math_tools" )
 
 /*	HIROSHI AKIMA "A method of smooth curve fitting" 1969
 
