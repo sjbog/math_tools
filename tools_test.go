@@ -319,7 +319,7 @@ func Test_Bit_max ( t * testing.T )	{
 	}
 }
 
-func Test_Bit_avg ( t * testing.T )	{
+func Test_BitAvgFloor ( t * testing.T )	{
 
 	t.Parallel ()
 
@@ -339,12 +339,56 @@ func Test_Bit_avg ( t * testing.T )	{
 	)
 
 	for	i, size := 0, len ( cases ) ; i < size ; i += 3	{
-
-		result	= Bit_avg ( cases [ i ], cases [ i +1 ] )
+		result	= BitAvgFloor( cases [ i ], cases [ i +1 ] )
 
 		if	result != cases [ i +2 ]	{
-
 			t.Errorf ( "Expected %v, got %v", cases [ i +2 ], result )
 		}
+	}
+}
+
+func Test_BitAvgCeil ( t * testing.T )	{
+
+	t.Parallel ()
+
+	var (
+		cases	= [] int {
+			 4,  2,  3,
+			-4, -2, -3,
+			-1,  1,  0,
+
+//			FLoor cases
+			 4, 5,  5,
+			-1, 0, 0,
+			-1,-2, -1,
+		}
+
+		result	int
+	)
+
+	for	i, size := 0, len ( cases ) ; i < size ; i += 3	{
+		result	= BitAvgCeil( cases [ i ], cases [ i +1 ] )
+
+		if	result != cases [ i +2 ]	{
+			t.Errorf ( "Expected %v, got %v", cases [ i +2 ], result )
+		}
+	}
+}
+
+func Test_BitAbs ( t * testing.T )	{
+
+	t.Parallel ()
+
+	if	BitAbs ( -1 ) != 1 || BitAbs ( 5 ) != 5 || BitAbs ( -0 ) != 0	{
+		t.Error( "Bit absolute int error" )
+		t.FailNow()
+	}
+	if	BitAbs32 ( -1 ) != 1 || BitAbs32 ( 5 ) != 5 || BitAbs32 ( -0 ) != 0	{
+		t.Error( "Bit absolute int32 error" )
+		t.FailNow()
+	}
+	if	BitAbs64 ( -1 ) != 1 || BitAbs64 ( 5 ) != 5 || BitAbs64 ( -0 ) != 0	{
+		t.Error( "Bit absolute int64 error" )
+		t.FailNow()
 	}
 }

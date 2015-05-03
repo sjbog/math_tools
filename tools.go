@@ -7,7 +7,10 @@
 */
 package	math_tools
 
-import	"math/big"
+import	(
+	"math/big"
+	"strconv"
+)
 
 
 //	---------------------------
@@ -99,9 +102,27 @@ func Bit_max ( x, y int )		int {
 	Given two integer values x and y, the (floor of the) average normally would be computed by (x+y)/2; unfortunately, this can yield incorrect results due to overflow. A very sneaky alternative is to use (x&y)+((x^y)/2). If we are aware of the potential non-portability due to the fact that C does not specify if shifts are signed, this can be simplified to (x&y)+((x^y)>>1). In either case, the benefit is that this code sequence cannot overflow.
 
 */
-func Bit_avg ( x, y int )		int	{
-
+func BitAvgFloor( x, y int )	int	{
 	return ( x & y ) + ( ( x ^ y ) >> 1 )
+}
+
+func BitAvgCeil( x, y int )	int	{
+	return ( x | y ) - (( x ^ y ) >> 1 )
+}
+
+func BitAbs( x int )	int {
+	var y int = x >> ( strconv.IntSize -1 )
+	return ( x + y ) ^ y
+}
+
+func BitAbs32( x int32 )	int32 {
+	var y int32 = x >> 31
+	return ( x + y ) ^ y
+}
+
+func BitAbs64( x int64 )	int64 {
+	var y int64 = x >> 63
+	return ( x + y ) ^ y
 }
 
 
